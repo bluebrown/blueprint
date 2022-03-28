@@ -1,0 +1,35 @@
+# TODO
+
+- [x] recursive Templates
+- [x] pre / post Hooks
+- [x] clone
+- [x] value overrides
+- [x] values from file
+- [x] values from url
+- [x] input
+- [x] values merge
+- [x] render hooks before executing
+- [x] exclude
+- [x] raw
+- [x] json schema
+- [x] helpers
+- [x] sprig functions
+- [x] helm style tpl
+- [x] helm style include
+- [x] preserve Permissions
+- [x] Document gitignore behavior
+- [x] ?! Context cancellation via signals
+- [x] Reusable single template for path segments, exclude and raw
+- [x] --no-hooks flag
+- [x] Docker build
+- [x] install Makefile target
+- [x] install instructions in README
+- [x] ?! cross Platform
+- [x] Example section in README
+- [x] generate in current dir using the dot
+- [x] flags after the command
+- [x] refuse to use non empty output dir
+- [ ] more funcs (toYaml, toToml etc. fromJson, fromYaml, fromToml)
+- [ ] Format cmd error output
+- [ ] Validate CLI command (dry-run)
+- [ ] vscode extension

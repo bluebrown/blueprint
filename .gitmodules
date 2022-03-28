@@ -1,0 +1,3 @@
+[submodule "assets/example/repo"]
+	path = assets/example/repo
+	url = git@github.com:bluebrown/blueprint-example.git

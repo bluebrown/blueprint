@@ -1,0 +1,81 @@
+{
+  "name": "Blueprint Config",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "type": "array",
+      "description": "A List of inputs to prompt the user for. The provided responses is merged into the values. If a value from the inputs was set with the --set flag or --values flag, the input prompt is skipped.",
+      "markdown": "A List of inputs to prompt the user for. The provided responses is merged into the values.\nIf a value from the inputs was set with the --set flag or --values flag, the input prompt is skipped.\n\n",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exclude": {
+      "type": "array",
+      "description": "List of exclude objects containing a pattern to match relative to the project root, and an optional condition. If no condition is specified, the path is excluded, otherwise the condition is used to determine if the path should be excluded.",
+      "markdownDescription": "List of exclude objects containing a pattern to match relative to the project root, and an optional condition.\nIf no condition is specified, the path is excluded, otherwise the condition is used to determine if the path should be excluded.\n\n",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pattern"
+        ],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "description": "Pattern to exclude. File or directories relative to the root of the repository. The pattern follows .gitignore rules.",
+            "markdownDescription": "Pattern to exclude.\nFile or directories relative to the root of the repository.\nThe pattern follows .gitignore rules.\n\n"
+          },
+          "condition": {
+            "type": "string",
+            "description": "A go template snippet that should evaluate to a boolean. The template is executed with the blueprint data as context. (Optional)",
+            "markdownDescription": "A go template snippet that should evaluate to a boolean.\nThe template is executed with the blueprint data as context. (Optional)\n\n"
+          }
+        }
+      }
+    },
+    "raw": {
+      "type": "array",
+      "description": "List of pattern to match relative to the project root. Matched files are not executed as template but directly copied to the output directory. The pattern follow .gitignore rules.",
+      "markdownDescription": "List of pattern to match relative to the project root.\nMatched files are not executed as template but directly copied to the output directory.\nThe pattern follow .gitignore rules.\n\n"
+    },
+    "preHooks": {
+      "description": "List of pre-hook objects containing a script to run before the project has been created.",
+      "markdownDescription": "List of pre-hook objects containing a script to run before the project has been created.\n\n",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/hook"
+      }
+    },
+    "postHooks": {
+      "description": "List of post-hook objects containing a script to run after the project has been created.",
+      "markdownDescription": "List post-hook objects containing a script to run after the project has been created.\n\n",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/hook"
+      }
+    }
+  },
+  "definitions": {
+    "hook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "script"
+      ],
+      "properties": {
+        "name": {
+          "description": "The name of the hook. (Optional)",
+          "markdownDescription": "The name of the hook. (Optional)\n\n",
+          "type": "string"
+        },
+        "script": {
+          "description": "The script to run. It is executed via 'sh -c'. Use a multi-line string to run multiple commands in a single script. The script is rendered as template with the blueprint data as context before being executed.",
+          "markdownDescription": "The script to run. It is executed via 'sh -c'.\nUse a multi-line string to run multiple commands in a single script.\nThe script is rendered as template with the blueprint data as context before being executed.\n\n",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

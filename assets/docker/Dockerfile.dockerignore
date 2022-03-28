@@ -1,0 +1,13 @@
+/.bin/
+/.dist/
+/.git/
+/.vscode/
+/assets/
+
+/.editorconfig
+/.gitignore
+/.gitmodules
+/LICENSE
+/Makefile
+/README.md
+/schema.json
