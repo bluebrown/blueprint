@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 go build -a \
     -installsuffix static \
     ./cmd/
 
-FROM gcr.io/distroless/static:nonroot
-FROM busybox
-COPY --from=builder /workspace/bin/blueprint /
-ENTRYPOINT [ "/blueprint" ]
+FROM bitnami/git
+COPY --from=builder /workspace/bin/blueprint /bin/blueprint
+ENTRYPOINT [ "blueprint" ]
+WORKDIR /work

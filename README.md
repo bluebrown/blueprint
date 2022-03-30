@@ -123,8 +123,6 @@ You can use the [json schema](./assets/schema/blueprint.json) to validate your b
 
 ## Installation
 
-<!--
-
 ### Binary
 
 Download the binary from the [release page](https://github.com/bluebrown/blueprint/releases). For example
@@ -134,8 +132,6 @@ curl -fsSLO https://github.com/bluebrown/blueprint/releases/download/v0.1.0-alph
 tar -xzf blueprint-amd64-static.tar.gz
 mv blueprint-0.1.0-alpha-amd64-static /usr/local/bin/blueprint
 ```
-
--->
 
 ### Go
 
@@ -147,7 +143,7 @@ go install github.com/bluebrown/blueprint
 
 ### Docker
 
-The binary is also available as [docker image](https://hub.docker.com/repository/docker/bluebrown/blueprint).
+The binary is also available as [docker image](https://hub.docker.com/repository/docker/bluebrown/blueprint). If you are using hooks, this might fail as some of the hooks dependencies are not available in the image. You can disable the hooks with the `--no-hooks` flag if you still want to use the image.
 
 ### From source
 
@@ -163,14 +159,20 @@ cd blueprint && make
 The below examples fetches the blueprint repo and generates a project in the my-project directory. It will prompt for some inputs before generating the project.The provided inputs are used in the templates.
 
 ```bash
-docker run bluebrown/blueprint https://github.com/bluebrown/blueprint-example my-project
+blueprint https://github.com/bluebrown/blueprint-example my-project
 ```
 
 Some values may not be part of the inputs. It is still possible to set them. For example with the `--set flag`.
 
 ```bash
-docker run bluebrown/blueprint https://github.com/bluebrown/blueprint-example my-project \
-    --set service.enabled=false
+blueprint https://github.com/bluebrown/blueprint-example my-project --set service.enabled=false
+```
+
+If you are using docker, mount your workdir to /work and use the --user flag to get the correct permissions. Potentially set the --no-hooks flag to disable the hooks, if they depend on some programming language that isnt available in the image.
+
+```bash
+docker run --user "$(id -u):$(id -g)" --volume "$PWD:/work" --tty --interactive \
+    bluebrown/blueprint https://github.com/bluebrown/blueprint-example my-project --no-hooks
 ```
 
 ## License
