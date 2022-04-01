@@ -63,11 +63,9 @@ exclude:
     condition: "{{ not .Values.some.value }}"
 
 
-# List of exclude objects containing a pattern to match
-# relative to the project root, and an optional condition.
-# If no condition is specified, the path is excluded,
-# otherwise the condition is used to determine if the path
-# should be excluded.
+# List of pattern to match relative to the project root.
+# Matched files are not executed as template but directly
+# copied to the output directory.
 # The pattern follow .gitignore rules.
 raw:
   - "foo/**/*.txt"
@@ -177,6 +175,6 @@ docker run --user "$(id -u):$(id -g)" --volume "$PWD:/work" --tty --interactive 
 
 ## License
 
-Some files in this repository contain embedded license notes. These files have been placed in the lib directory with the given vendor name as package name.
+Some files in this repository contain embedded license notes. These files have been placed in the [lib directory](./lib/) with the given vendor name as package name.
 
 The other files in this repository are licensed under the BSD 0-Clause License. See the [LICENSE file](./LICENSE) for more information.
