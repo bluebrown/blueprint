@@ -133,16 +133,24 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	data.Values = values.Merge(data.Values, overrides)
 
 	// get the user input
-	for i, key := range blueprintMeta.Input {
+	inputs := make([]string, 0, len(blueprintMeta.Input))
+	for _, key := range blueprintMeta.Input {
 		val, err := values.GetInput(key, data.Values)
 		if err != nil {
 			return err
 		}
-		blueprintMeta.Input[i] = fmt.Sprintf("%s=%s", key, val)
+		// only use it if it has been provided via stdin
+		// otherwise, the default is already in the values
+		// so we don't need to parse and merge it
+		// parsing it would also lead to complications
+		// due to syntax differences
+		if val != "" {
+			inputs = append(inputs, fmt.Sprintf("%s=%s", key, val))
+		}
 	}
 
 	// merge user input into the values map
-	inputVals, err := strvals.Parse(strings.Join(blueprintMeta.Input, ","))
+	inputVals, err := strvals.Parse(strings.Join(inputs, ","))
 	if err != nil {
 		return err
 	}

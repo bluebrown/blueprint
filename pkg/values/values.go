@@ -51,23 +51,22 @@ func Lookup(key string, data map[string]any) (value any, exists bool) {
 	return nil, false
 }
 
-// get the user input from the terminal, commas are automatically escaped
-func GetInput(key string, data map[string]any) (any, error) {
+// get the user input from the terminal
+func GetInput(key string, data map[string]any) (input any, err error) {
+	// lookup the default value to show in the prompt
 	defaultValue, _ := Lookup(key, data)
 	fmt.Printf("%s [%v]: ", key, defaultValue)
+
+	// read the user input
 	in := bufio.NewReader(os.Stdin)
 	line, err := in.ReadString('\n')
 	if err != nil {
-		return nil, err
+		return err, nil
 	}
-	line = strings.TrimSpace(line)
-	if line == "" {
-		if s, ok := defaultValue.(string); ok {
-			return strings.ReplaceAll(s, ",", "\\,"), nil
-		}
-		return defaultValue, nil
-	}
-	return line, nil
+
+	// return the trimmed input
+	return strings.TrimSpace(line), nil
+
 }
 
 // read the values from a file at the given path into dist
