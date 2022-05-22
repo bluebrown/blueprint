@@ -22,8 +22,7 @@ build:
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a \
 		-ldflags '-X main.version=$(version) -X main.buildDate=$(shell date +%Y-%m-%d)' \
 		-o $(bin_dir)/$(name)-$(version)-$(GOARCH)-static \
-		-installsuffix static \
-		./cmd/
+		./cmd/blueprint/
 
 dist:
 	mkdir -p $(dist_dir)

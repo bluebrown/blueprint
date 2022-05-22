@@ -140,7 +140,7 @@ mv blueprint-0.1.0-alpha-amd64-static /usr/local/bin/blueprint
 If you have go installed, you can use the `go install` command to install the binary.
 
 ```bash
-go install github.com/bluebrown/blueprint
+go install github.com/bluebrown/blueprint/cmd/blueprint@latest
 ```
 
 ### Docker
