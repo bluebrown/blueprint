@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bluebrown/blueprint/pkg/types"
 	flag "github.com/spf13/pflag"
 )
 
-func init() {
+func setUsage() {
 	flag.Usage = func() {
 		fmt.Print(`Usage:
         blueprint [source] [destination] [flags]
@@ -24,11 +23,10 @@ Flags:
 	}
 }
 
-func parseFlags() (sets types.StringSlice, values types.StringSlice, noHooks bool) {
-	sets = types.StringSlice{}
-	values = types.StringSlice{}
-	flag.Var(&sets, "set", "set one or more values seperated by comma. i.e. a=1,b=2. Flag can be specified multiple times")
-	flag.VarP(&values, "values", "f", "set values from a file or url. Flag can be specified multiple times")
+func parseFlags() (sets *[]string, values *[]string, noHooks bool) {
+	setUsage()
+	sets = flag.StringArray("set", []string{}, "set one or more values seperated by comma. i.e. a=1,b=2. Flag can be specified multiple times")
+	values = flag.StringArrayP("values", "f", []string{}, "set values from a file or url. Flag can be specified multiple times")
 	flag.BoolVar(&noHooks, "no-hooks", false, "disable the pre and post hooks")
 
 	var showHelp bool

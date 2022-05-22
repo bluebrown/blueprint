@@ -1,10 +1,11 @@
-package values
+package bp
 
 import (
 	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
@@ -12,8 +13,8 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// merge all maps prefering values found later in the list
-func Merge(maps ...map[string]any) map[string]any {
+// merge all maps preferring values found later in the list
+func MergeMaps(maps ...map[string]any) map[string]any {
 	out := make(map[string]any)
 	for _, m := range maps {
 		out = helm.MergeMaps(out, m)
@@ -23,7 +24,7 @@ func Merge(maps ...map[string]any) map[string]any {
 
 // lookup nested values in a map by flat key path. i.e. foo.bar.baz
 // if the map contains a dot, it must be escaped with a backslash
-func Lookup(key string, data map[string]any) (value any, exists bool) {
+func LookupValue(key string, data map[string]any) (value any, exists bool) {
 	// split the keys into parts
 	// swapping the escaped dot for a null byte
 	key = strings.ReplaceAll(key, "\\.", "\x00")
@@ -54,7 +55,7 @@ func Lookup(key string, data map[string]any) (value any, exists bool) {
 // get the user input from the terminal
 func GetInput(key string, data map[string]any) (input any, err error) {
 	// lookup the default value to show in the prompt
-	defaultValue, _ := Lookup(key, data)
+	defaultValue, _ := LookupValue(key, data)
 	fmt.Printf("%s [%v]: ", key, defaultValue)
 
 	// read the user input
@@ -82,7 +83,8 @@ func ReadFile(path string, dist any) error {
 
 // read the values from the given url into dist
 func ReadURL(url string, dist any) error {
-	res, err := httpClient.Get(url)
+	// TODO: use context
+	res, err := http.Get(url)
 	if err != nil {
 		return err
 	}
