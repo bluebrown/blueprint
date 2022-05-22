@@ -22,8 +22,7 @@ build:
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a \
 		-ldflags '-X main.version=$(version) -X main.buildDate=$(shell date +%Y-%m-%d)' \
 		-o $(bin_dir)/$(name)-$(version)-$(GOARCH)-static \
-		-installsuffix static \
-		./cmd/
+		./cmd/blueprint/
 
 dist:
 	mkdir -p $(dist_dir)
@@ -52,10 +51,10 @@ image.push:
 # example
 
 example.local: example.clean
-	go run ./cmd/ assets/example/repo/ assets/myrepo --set service.enabled=false -f assets/example/v.yaml --values assets/example/v2.yaml
+	go run ./cmd/blueprint/ assets/example/repo/ assets/myrepo --set service.enabled=false -f assets/example/v.yaml --values assets/example/v2.yaml
 
 example.upstream: example.clean
-	go run ./cmd/ https://github.com/bluebrown/$(name)-example assets/myrepo \
+	go run ./cmd/blueprint/ https://github.com/bluebrown/$(name)-example assets/myrepo \
 	-f https://gist.githubusercontent.com/bluebrown/be3637e410f80b6c0eeeae5dc95ca662/raw/8be2a8e561463ac97448930a146bc0a9095616d4/$(name)-example-values.yaml
 
 example.clean:

@@ -8,18 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bluebrown/blueprint/pkg/fs"
-	"github.com/bluebrown/blueprint/pkg/hooks"
-	"github.com/bluebrown/blueprint/pkg/repo"
-	tpl "github.com/bluebrown/blueprint/pkg/template"
-	"github.com/bluebrown/blueprint/pkg/types"
-	"github.com/bluebrown/blueprint/pkg/values"
-	"github.com/bluebrown/blueprint/pkg/walk"
+	"github.com/bluebrown/blueprint/bp"
 	"helm.sh/helm/v3/pkg/strvals"
 	"sigs.k8s.io/yaml"
 )
 
-func blueprint(ctx context.Context, input, output string, sets, vals types.StringSlice, noHooks bool) error {
+func run(ctx context.Context, input, output string, sets, vals []string, noHooks bool) error {
 	var inPath string
 	var err error
 
@@ -36,12 +30,12 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 
 	// check if the outpath already exists, if so check if it's empty
 	// if it's not empty, return an error
-	exists, err := fs.Exists(outPath)
+	exists, err := bp.PathExists(outPath)
 	if err != nil {
 		return fmt.Errorf("error checking if output path exists: %w", err)
 	}
 	if exists {
-		isEmpty, err := fs.IsEmpty(outPath)
+		isEmpty, err := bp.IsEmptyDir(outPath)
 		if err != nil {
 			return fmt.Errorf("error while checking if output path is empty: %w", err)
 		}
@@ -50,9 +44,9 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 		}
 	}
 
-	// clone the repo from upsteam if required
-	if repo.IsUpsteam(input) {
-		inPath, err = repo.Clone(ctx, input)
+	// clone the repo from upstream if required
+	if bp.IsUpstreamRepo(input) {
+		inPath, err = bp.CloneRepo(ctx, input)
 		if err != nil {
 			return err
 		}
@@ -78,15 +72,15 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 		return err
 	}
 
-	var blueprintMeta types.BlueprintMeta
+	var blueprintMeta bp.BlueprintMeta
 	err = yaml.Unmarshal(b, &blueprintMeta)
 	if err != nil {
 		return err
 	}
 
 	// the data is passed to the templates as a struct
-	data := &types.Data{
-		Project: types.Project{
+	data := &bp.Data{
+		Project: bp.Project{
 			// the project name is the name of the output directory
 			Name: filepath.Base(filepath.Base(outPath)),
 		},
@@ -96,7 +90,7 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 
 	// read the values
 	valuesFilePath := filepath.Join(inPath, valuesFileName)
-	err = values.ReadFile(valuesFilePath, &data.Values)
+	err = bp.ReadFile(valuesFilePath, &data.Values)
 	if err != nil {
 		return err
 	}
@@ -106,36 +100,36 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	// read the values from the -f or --values flags
 	// and merge them into the values
 	for _, f := range vals {
-		err = values.ReadValues(f, &overrides)
+		err = bp.ReadValues(f, &overrides)
 		if err != nil {
 			return err
 		}
 	}
 
 	// merge the --set values into the values map
-	setVals, err := strvals.Parse(sets.String())
+	setVals, err := strvals.Parse(strings.Join(sets, ","))
 	if err != nil {
 		return err
 	}
-	overrides = values.Merge(overrides, setVals)
+	overrides = bp.MergeMaps(overrides, setVals)
 
 	// remove the input question for values that have been set
 	// via --set or --values
 	newInput := make([]string, 0, len(blueprintMeta.Input))
 	for _, q := range blueprintMeta.Input {
-		if _, ok := values.Lookup(q, overrides); !ok {
+		if _, ok := bp.LookupValue(q, overrides); !ok {
 			newInput = append(newInput, q)
 		}
 	}
 	blueprintMeta.Input = newInput
 
 	// merge the overrides into the values
-	data.Values = values.Merge(data.Values, overrides)
+	data.Values = bp.MergeMaps(data.Values, overrides)
 
 	// get the user input
 	inputs := make([]string, 0, len(blueprintMeta.Input))
 	for _, key := range blueprintMeta.Input {
-		val, err := values.GetInput(key, data.Values)
+		val, err := bp.GetInput(key, data.Values)
 		if err != nil {
 			return err
 		}
@@ -154,7 +148,7 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	if err != nil {
 		return err
 	}
-	data.Values = values.Merge(data.Values, inputVals)
+	data.Values = bp.MergeMaps(data.Values, inputVals)
 
 	// make the output dir
 	err = os.MkdirAll(outPath, 0755)
@@ -163,12 +157,12 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	}
 
 	// create the base template
-	t := tpl.BaseTemplate()
+	t := bp.BaseTemplate()
 
 	// run pre hook if it exists and we're not in no-hooks mode
 	if !noHooks {
 		for _, hook := range blueprintMeta.PreHooks {
-			err := hooks.Run(ctx, t, outPath, hook, data)
+			err := bp.RunHook(ctx, t, outPath, hook, data)
 			if err != nil {
 				return err
 			}
@@ -193,24 +187,24 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	}
 
 	// make the raw rules
-	rawMatcher, err := fs.NewFileMatcher(blueprintMeta.Raw)
+	rawMatcher, err := bp.NewFileMatcher(blueprintMeta.Raw)
 	if err != nil {
 		return err
 	}
 
 	// make the exclude rules
-	excludes, err := fs.CompileExcludes(t, blueprintMeta.Exclude, data)
+	excludes, err := bp.CompileExcludes(t, blueprintMeta.Exclude, data)
 	if err != nil {
 		return err
 	}
 
-	excludeMatcher, err := fs.NewFileMatcher(excludes)
+	excludeMatcher, err := bp.NewFileMatcher(excludes)
 	if err != nil {
 		return err
 	}
 
 	// walk the input dir
-	err = filepath.WalkDir(".", walk.MakeWalker(t, data, outPath, excludeMatcher, rawMatcher, helpersFileName))
+	err = filepath.WalkDir(".", bp.MakeFsWalker(t, data, outPath, excludeMatcher, rawMatcher, helpersFileName))
 	if err != nil {
 		return err
 	}
@@ -218,7 +212,7 @@ func blueprint(ctx context.Context, input, output string, sets, vals types.Strin
 	// run post hook if it exists and we're not in no-hooks mode
 	if !noHooks {
 		for _, hook := range blueprintMeta.PostHooks {
-			err := hooks.Run(ctx, t, outPath, hook, data)
+			err := bp.RunHook(ctx, t, outPath, hook, data)
 			if err != nil {
 				return err
 			}

@@ -10,9 +10,22 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+var (
+	version   string = "0.1.0-alpha"
+	buildDate string = "2022-03-27"
+
+	templatesDir    string = "templates"
+	configFileName  string = "blueprint.yaml"
+	valuesFileName  string = "values.yaml"
+	helpersFileName string = "_helpers.tpl"
+)
+
 func main() {
 	// get the flag values
 	sets, values, noHooks := parseFlags()
+
+	fmt.Println("sets:", sets)
+	fmt.Println("values:", values)
 
 	// input is the repo containing a templates dir and values.yaml
 	input := flag.Arg(0)
@@ -40,7 +53,7 @@ func main() {
 		}
 	}()
 
-	err := blueprint(ctx, input, output, sets, values, noHooks)
+	err := run(ctx, input, output, *sets, *values, noHooks)
 	if err != nil {
 		cancel()
 		fmt.Fprintln(os.Stderr, err)

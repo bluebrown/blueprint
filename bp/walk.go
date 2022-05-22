@@ -1,4 +1,4 @@
-package walk
+package bp
 
 import (
 	"fmt"
@@ -7,16 +7,16 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
-
-	bpfs "github.com/bluebrown/blueprint/pkg/fs"
-	tpl "github.com/bluebrown/blueprint/pkg/template"
-	"github.com/bluebrown/blueprint/pkg/types"
 )
+
+type Matcher interface {
+	Match(string, os.FileInfo) bool
+}
 
 // makeWalker returns a filepath.WalkFunc that renders all
 // template found in the file tree with the given data and
 // writes them to the output directory
-func MakeWalker(t *template.Template, data *types.Data, outPath string, excludeMatcher, rawMatcher bpfs.Matcher, helpersFileName string) fs.WalkDirFunc {
+func MakeFsWalker(t *template.Template, data *Data, outPath string, excludeMatcher, rawMatcher Matcher, helpersFileName string) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
 		// return if its an error
 		if err != nil {
@@ -44,7 +44,7 @@ func MakeWalker(t *template.Template, data *types.Data, outPath string, excludeM
 		}
 
 		// render the path as a template
-		renderedPath, err := tpl.RenderString(t, path, data)
+		renderedPath, err := RenderString(t, path, data)
 		if err != nil {
 			return fmt.Errorf("failed to render path %s: %w", path, err)
 		}

@@ -105,6 +105,10 @@ type Data struct {
 
 Each blueprint repo has a templates directory which contains the templates. This directory is traversed recursively, and found templates are rendered and added to the destination directory. Paths are also rendered as templates
 
+## Inputs
+
+When provided inputs from the user are parsed with helms [strval.Parser](https://github.com/helm/helm/blob/ee3f270e1eff0d462312635ad91cecd6f1fce620/pkg/strvals/parser.go) which is also used for the --set flag. That means all the rules for helms `--set` flag apply. Certain characters need to be escaped with a backslash `\`. Specifically, commas and curly braces.
+
 ## JSON Schema
 
 You can use the [json schema](./assets/schema/blueprint.json) to validate your blueprint. For example if you are vscode and the redhat yaml extension is installed you can add a setting to your settings.json file to validate your blueprint.
@@ -136,7 +140,7 @@ mv blueprint-0.1.0-alpha-amd64-static /usr/local/bin/blueprint
 If you have go installed, you can use the `go install` command to install the binary.
 
 ```bash
-go install github.com/bluebrown/blueprint
+go install github.com/bluebrown/blueprint/cmd/blueprint@latest
 ```
 
 ### Docker
