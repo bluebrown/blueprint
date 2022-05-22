@@ -24,9 +24,6 @@ func main() {
 	// get the flag values
 	sets, values, noHooks := parseFlags()
 
-	fmt.Println("sets:", sets)
-	fmt.Println("values:", values)
-
 	// input is the repo containing a templates dir and values.yaml
 	input := flag.Arg(0)
 
