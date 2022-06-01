@@ -16,14 +16,14 @@ Blueprint is a template based project generation tool, like cookiecutter, writte
 
 ```console
 Usage:
-        blueprint [flags] [source] [destination]
+  blueprint [source] [destination] [flags]
 
 Flags:
-        --set stringArray       set values from the CLI multiple values can be set with comma separated i.e. key1=val1,key2=val2 or by using the flag multiple times
-    -f, --values strings        set values from a yaml file or url. multiple files/urls can be used by using the flag multiple times
-        --no-hooks              disable hooks when generating the blueprint
-    -v, --version               print the version
-    -h, --help                  show the help help text
+      --set stringArray      set one or more values separated by comma. i.e. a=1,b=2. Flag can be specified multiple times
+  -f, --values stringArray   set values from a file or url. Flag can be specified multiple times
+      --no-hooks             disable the pre and post hooks
+  -h, --help                 show the help text
+  -v, --version              show the version
 ```
 
 The source is a git repository that contains the templates. The destination is the directory where the project will be generated. The source can also a be a local directory.
