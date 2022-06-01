@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	version   string = "0.1.0-alpha"
+	version   string = "0.1.0"
 	buildDate string = "2022-03-27"
 
 	templatesDir    string = "templates"

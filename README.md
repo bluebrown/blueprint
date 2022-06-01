@@ -130,9 +130,8 @@ You can use the [json schema](./assets/schema/blueprint.json) to validate your b
 Download the binary from the [release page](https://github.com/bluebrown/blueprint/releases). For example
 
 ```bash
-curl -fsSLO https://github.com/bluebrown/blueprint/releases/download/v0.1.0-alpha/blueprint-amd64-static.tar.gz
-tar -xzf blueprint-amd64-static.tar.gz
-mv blueprint-0.1.0-alpha-amd64-static /usr/local/bin/blueprint
+curl -fsSL https://github.com/bluebrown/go-template-cli/releases/latest/download/blueprint-linux-amd64  >blueprint
+chmod 755 blueprint
 ```
 
 ### Go
