@@ -5,32 +5,26 @@ GOOS=linux
 GOARCH=amd64
 
 # build and dist output
-dist_dir=.dist
 bin_dir=.bin
 
 # project nam and version
 name=blueprint
-version=0.1.0-alpha
+version=0.1.0
 
 
 # local build
 
 install: build
-	sudo cp -f $(bin_dir)/$(name)-$(version)-$(GOARCH)-static /usr/local/bin/$(name)
+	sudo cp -f $(bin_dir)/$(name)-linux-$(GOARCH) /usr/local/bin/$(name)
 
 build:
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a \
 		-ldflags '-X main.version=$(version) -X main.buildDate=$(shell date +%Y-%m-%d)' \
-		-o $(bin_dir)/$(name)-$(version)-$(GOARCH)-static \
+		-o $(bin_dir)/$(name)-linux-$(GOARCH) \
 		./cmd/blueprint/
-
-dist:
-	mkdir -p $(dist_dir)
-	tar -czf $(dist_dir)/$(name)-$(GOARCH)-static.tar.gz $(bin_dir)/$(name)-$(version)-$(GOARCH)-static
 
 clean:
 	rm -rf $(bin_dir)
-	rm -rf $(dist_dir)
 
 
 # docker image
